@@ -187,5 +187,5 @@ target/credit-simulator-1.0-SNAPSHOT-jar-with-dependencies.jar
 ## 👤 Author
 
 - **Name:** Daniel Sulistio
-- **Position Applied:** Backend Developer (BCA Digital / ITSME)
+- **Position Applied:** Backend Developer (BCA Digital)
 - **GitHub:** [temptedwithouta](https://github.com/temptedwithouta)
