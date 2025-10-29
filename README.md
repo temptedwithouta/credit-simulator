@@ -32,16 +32,16 @@ itsme-credit-simulator/
 ├── pom.xml                         # Maven configuration
 ├── README.md                       # Project documentation
 ├── src/
-│   ├── main/java/com/itsme/creditsimulator/
+│   ├── main/java/org/example/
 │   │   ├── controller/
 │   │   ├── model/
 │   │   ├── service/
 │   │   └── Main.java
-│   └── test/java/com/itsme/creditsimulator/service/
+│   └── test/java/
 │       ├── CalculationServiceTest.java
 │       ├── ValidationServiceTest.java
 │       └── ApiServiceTest.java
-└── .github/workflows/docker-build.yml # CI/CD pipeline
+└── .github/workflows/docker-build.yaml # CI/CD pipeline
 ````
 
 ---
@@ -134,7 +134,7 @@ docker run --rm temptedwithouta/credit-simulator:latest
 ## 🤖 CI/CD with GitHub Actions
 
 This project includes a workflow file:
-`.github/workflows/docker-build.yml`
+`.github/workflows/docker-build.yaml`
 
 ### Pipeline Steps
 
