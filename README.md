@@ -113,6 +113,24 @@ If successful, you’ll see:
 
 ---
 
+## 🐳 Run with Docker
+
+### 🔹 Build and Run Locally
+
+```bash
+docker build -t credit-simulator .
+docker run --rm credit-simulator
+```
+
+### 🔹 Pull from Docker Hub
+
+```bash
+docker pull temptedwithouta/credit-simulator:latest
+docker run --rm temptedwithouta/credit-simulator:latest
+```
+
+---
+
 ## 🤖 CI/CD with GitHub Actions
 
 This project includes a workflow file:
