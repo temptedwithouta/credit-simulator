@@ -41,7 +41,7 @@ itsme-credit-simulator/
 │       ├── CalculationServiceTest.java
 │       ├── ValidationServiceTest.java
 │       └── ApiServiceTest.java
-
+└── .github/workflows/docker-build.yml # CI/CD pipeline
 ````
 
 ---
