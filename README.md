@@ -113,6 +113,42 @@ If successful, you’ll see:
 
 ---
 
+## 🐳 Run with Docker
+
+### 🔹 Build and Run Locally
+
+```bash
+docker build -t credit-simulator
+docker run --rm credit-simulator
+```
+
+### 🔹 Pull from Docker Hub
+
+```bash
+docker pull temptedwithouta/credit-simulator:latest
+docker run --rm temptedwithouta/credit-simulator:latest
+```
+
+---
+
+## 🤖 CI/CD with GitHub Actions
+
+This project includes a workflow file:
+`.github/workflows/docker-build.yml`
+
+### Pipeline Steps
+
+1. Runs automatically on every push to `main`
+2. Builds the Maven project (`mvn clean package assembly:single`)
+3. Builds Docker image
+4. Pushes image to Docker Hub:
+
+   ```
+   https://hub.docker.com/r/temptedwithouta/credit-simulator
+   ```
+
+---
+
 ## 🧰 Environment Setup
 
 ### Requirements
@@ -153,4 +189,3 @@ target/credit-simulator-1.0-SNAPSHOT-jar-with-dependencies.jar
 - **Name:** Daniel Sulistio
 - **Position Applied:** Backend Developer (BCA Digital / ITSME)
 - **GitHub:** [temptedwithouta](https://github.com/temptedwithouta)
-
