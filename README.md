@@ -1,191 +1,125 @@
-# 💳 Credit Simulator
+# Credit Simulator
 
-A command-line Java application for simulating vehicle loan (credit) calculation based on **vehicle type**, **condition
-**, **year**, **loan amount**, and **down payment**.  
-Developed as part of the Backend Developer technical test.
+A Java command-line application that simulates vehicle loan installments. This portfolio project demonstrates object-oriented Java, separation of application responsibilities, automated tests, Docker packaging, and a GitHub Actions delivery pipeline.
 
----
+## Features
 
-## 🧠 Features
+- Simulate vehicle loans for cars and motorcycles, with new and used vehicle rules.
+- Calculate yearly installment amounts with changing interest rates.
+- Validate loan requests before calculating.
+- Accept interactive input or multiple requests from a text file.
+- Load a sample loan request from an HTTP JSON API and save interactive results to a text file.
+- Build and publish a Docker image through GitHub Actions.
 
-- Calculate annual loan simulation for **Mobil** or **Motor**
-- Different rules for **Baru** and **Bekas** vehicles
-- Dynamic **interest rate increase** every year (0.1% / 0.5%)
-- Validation for DP percentage, vehicle year, and tenor
-- Support for both **manual input** and **file input**
-- Includes **unit tests** for all services:
-    - `CalculationService`
-    - `ValidationService`
-    - `ApiService`
-- Fully containerized using **Docker**
-- **CI/CD with GitHub Actions** to build & push image to Docker Hub automatically
+## Java Structure
 
----
+```text
+src/main/java/org/example/
+├── Main.java
+├── controller/   # Coordinates menu, input, and application services
+├── model/        # Loan request and calculation result data
+├── service/      # Loan calculation, validation, and HTTP/JSON API access
+└── view/         # Console output and result formatting
 
-## ⚙️ Project Structure
-
+src/test/java/
+├── ApiServiceTest.java
+├── CalculationServiceTest.java
+└── ValidationServiceTest.java
 ```
 
-itsme-credit-simulator/
-├── credit_simulator                # Executable launcher script (MANDATORY)
-├── Dockerfile                      # Docker image definition
-├── pom.xml                         # Maven configuration
-├── README.md                       # Project documentation
-├── src/
-│   ├── main/java/org/example/
-│   │   ├── controller/
-│   │   ├── model/
-│   │   ├── service/
-│   │   └── Main.java
-│   └── test/java/
-│       ├── CalculationServiceTest.java
-│       ├── ValidationServiceTest.java
-│       └── ApiServiceTest.java
-└── .github/workflows/docker-build.yaml # CI/CD pipeline
-````
+The controllers coordinate user interaction and service calls. Calculation and validation rules are kept in services, while the models represent requests and results. `ApiService` retrieves JSON over HTTP and maps it to a loan request.
 
----
+## Requirements
 
-## 🚀 How to Run the Application
+- Java 25
+- Maven 3.9 or later
+- Docker, for container builds and runs
+- Bash, for the `credit_simulator.sh` launcher
 
-### 🔹 1. Run Without File Input
+## Run
+
+Start the interactive CLI from a Bash-compatible shell:
 
 ```bash
-./credit_simulator
-````
+./credit_simulator.sh
+```
 
-This will start the simulator and ask you to input credit parameters manually (vehicle type, year, price, etc).
-
----
-
-### 🔹 2. Run With File Input
+To process the included sample input file:
 
 ```bash
-./credit_simulator file_inputs.txt
+./credit_simulator.sh file_input.txt
 ```
 
-**Sample `file_inputs.txt`:**
+Each non-empty line uses this format:
 
+```text
+<VehicleType>#<Condition>#<Year>#<TotalLoanAmount>#<TenorYears>#<DownPayment>
 ```
+
+For example:
+
+```text
 Mobil#Baru#2025#100000000#5#35000000
-Motor#Bekas#2023#50000000#3#15000000
+Motor#Bekas#2020#80000000#3#25000000
 ```
 
-Each line represents one credit simulation with:
+The interactive menu supports calculating a loan, loading a sample request from the API, and exiting. A completed interactive calculation can also be appended to a text file.
 
-```
-<VehicleType>#<Condition>#<Year>#<TotalLoanAmount>#<Tenor>#<DownPayment>
-```
+## Test and Package
 
-**Example Output:**
-
-```
-=== Hasil Simulasi Kredit ===
-Jenis: Mobil, Kondisi: Baru, Tahun: 2025, Pinjaman: Rp 100.000.000, Tenor: 5 tahun, DP: Rp 35.000.000
-Tahun: 1: Rp2.250.000/bulan, Suku Bunga: 8,00%
-Tahun: 2: Rp2.432.250/bulan, Suku Bunga: 8,10%
-Tahun: 3: Rp2.641.423/bulan, Suku Bunga: 8,60%
-===============================
-```
-
----
-
-## 🧪 Running Unit Tests
-
-To execute all unit tests:
+Run the test suite and Maven verification lifecycle:
 
 ```bash
-mvn test
+mvn -B clean verify
 ```
 
-Tests included:
-
-* `CalculationServiceTest` → verifies per-year loan calculation matches formula
-* `ValidationServiceTest` → validates all loan business rules
-* `ApiServiceTest` → mocks external API response using Mockito
-
-If successful, you’ll see:
-
-```
-[INFO] Tests run: 10, Failures: 0, Errors: 0, Skipped: 0
-[INFO] BUILD SUCCESS
-```
-
----
-
-## 🐳 Run with Docker
-
-### 🔹 Build and Run Locally
+There are 14 tests across the calculation, validation, and API service test classes. To build the executable assembly JAR:
 
 ```bash
-docker build -t credit-simulator .
-docker run --rm credit-simulator
+mvn -B clean package assembly:single
+java -jar target/credit-simulator-1.0-SNAPSHOT-jar-with-dependencies.jar
 ```
 
-### 🔹 Pull from Docker Hub
+## Docker
+
+Build the image locally. The Dockerfile packages the application in a Maven/Java 25 build stage and copies the runnable JAR into a Java 25 JRE runtime image.
+
+```bash
+docker build -t credit-simulator:local .
+docker run --rm -it credit-simulator:local
+```
+
+To process a local input file in the container from a Bash-compatible shell:
+
+```bash
+docker run --rm \
+    --mount "type=bind,source=$(pwd)/file_input.txt,target=/app/file_input.txt,readonly" \
+    credit-simulator:local file_input.txt
+```
+
+The published image is available from [Docker Hub](https://hub.docker.com/r/temptedwithouta/credit-simulator):
 
 ```bash
 docker pull temptedwithouta/credit-simulator:latest
-docker run --rm temptedwithouta/credit-simulator:latest
+docker run --rm -it temptedwithouta/credit-simulator:latest
 ```
 
----
+Each successful publish from `main` also creates a traceable `sha-<commit-sha>` tag.
 
-## 🤖 CI/CD with GitHub Actions
+## CI/CD
 
-This project includes a workflow file:
-`.github/workflows/docker-build.yaml`
+The workflow at `.github/workflows/docker-build.yaml` runs on pushes to `main`:
 
-### Pipeline Steps
+1. Checks out the repository and configures Java 25.
+2. Runs `mvn -B clean verify`; image publishing does not proceed if verification fails.
+3. Authenticates to Docker Hub using GitHub Actions secrets.
+4. Builds one image and publishes it as both `latest` and `sha-<commit-sha>`.
 
-1. Runs automatically on every push to `main`
-2. Builds the Maven project (`mvn clean package assembly:single`)
-3. Builds Docker image
-4. Pushes image to Docker Hub:
+Configure these repository secrets in GitHub before publishing:
 
-   ```
-   https://hub.docker.com/r/temptedwithouta/credit-simulator
-   ```
+- `DOCKERHUB_USERNAME`
+- `DOCKERHUB_TOKEN`
 
----
+## Author
 
-## 🧰 Environment Setup
-
-### Requirements
-
-* Java 25 or higher
-* Maven 3.9+
-* Docker (if building container)
-* Linux/Mac/WSL for `credit_simulator` execution script
-
----
-
-## 📦 Build Manually
-
-If you want to build JAR manually:
-
-```bash
-mvn clean package assembly:single
-```
-
-The compiled JAR will be located in:
-
-```
-target/credit-simulator-1.0-SNAPSHOT-jar-with-dependencies.jar
-```
-
----
-
-## 📄 Notes for Reviewer
-
-* All calculations, validation, and API calls are fully covered by unit tests.
-* The `credit_simulator` executable allows direct execution in UNIX-like systems.
-* Source code follows MVC structure and Java best practices.
-
----
-
-## 👤 Author
-
-- **Name:** Daniel Sulistio
-- **Position Applied:** Backend Developer (BCA Digital)
-- **GitHub:** [temptedwithouta](https://github.com/temptedwithouta)
+Daniel Sulistio · [GitHub](https://github.com/temptedwithouta)
